@@ -114,7 +114,7 @@ object OnlineCoursePlatform:
 
     override def removeCourse(course: Course): Unit = this.course = this.course.filter(_ != course)
 
-    override def isCourseAvailable(courseId: String): Boolean = this.course.map(_.courseId).contains(courseId)
+    override def isCourseAvailable(courseId: String): Boolean = !getCourse(courseId).isEmpty
 
     override def enrollStudent(studentId: String,
                                courseId: String): Unit = if isCourseAvailable(courseId) then this.c2s = this.c2s.concat(Sequence((courseId, studentId)))
@@ -122,9 +122,7 @@ object OnlineCoursePlatform:
     override def unenrollStudent(studentId: String,
                                  courseId: String): Unit = this.c2s = this.c2s.filter(_ != (courseId, studentId))
 
-    override def getStudentEnrollments(studentId: String): Sequence[Course] =
-      val enrolledCourses = this.c2s.filter(_._2 equals studentId).map(_._1)
-      this.course.filter(course => enrolledCourses.contains(course.courseId))
+    override def getStudentEnrollments(studentId: String): Sequence[Course] = this.course.filter(c => this.c2s.filter(_._2.equals(studentId)).map(e => e._1).contains(c.courseId))
 
     override def isStudentEnrolled(studentId: String,
                                    courseId: String): Boolean = this.c2s.contains((courseId, studentId))
