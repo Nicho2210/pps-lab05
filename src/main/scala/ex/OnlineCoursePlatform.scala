@@ -1,16 +1,13 @@
 package ex
 
 import util.Optionals.Optional
-import util.Sequences.* // Assuming Sequence and related methods are here
+import util.Sequences.*
 
 // Represents a course offered on the platform
 trait Course:
   def courseId: String // Unique identifier (e.g., "CS101", "SCALA01")
-
   def title: String
-
   def instructor: String
-
   def category: String // e.g., "Programming", "Data Science", "Design"
 
 
@@ -18,7 +15,10 @@ object Course:
   // Factory method for creating Course instances
   def apply(courseId: String, title: String, instructor: String, category: String): Course = CourseImpl(courseId, title, instructor, category)
 
-  private case class CourseImpl(courseId: String, title: String, instructor: String, category: String) extends Course
+  private case class CourseImpl(override val courseId: String,
+                                override val title: String,
+                                override val instructor: String,
+                                override val category: String) extends Course
 
 /**
  * Manages courses and student enrollments on an online learning platform.
@@ -102,7 +102,32 @@ end OnlineCoursePlatform
 
 object OnlineCoursePlatform:
   // Factory method for creating an empty platform instance
-  def apply(): OnlineCoursePlatform = ??? // Fill Here!
+  def apply(): OnlineCoursePlatform = OnlineCoursePlatformImpl() // Fill Here!
+
+  private case class OnlineCoursePlatformImpl(var course: Sequence[Course] = Sequence.empty,
+                                              var c2s: Sequence[(String,String)] = Sequence.empty) extends OnlineCoursePlatform:
+    override def addCourse(course: Course): Unit = this.course = this.course.concat(Sequence(course))
+
+    override def findCoursesByCategory(category: String): Sequence[Course] = this.course.filter(_.category.equals(category))
+
+    override def getCourse(courseId: String): Optional[Course] = this.course.find(_.courseId.equals(courseId))
+
+    override def removeCourse(course: Course): Unit = this.course = this.course.filter(_ != course)
+
+    override def isCourseAvailable(courseId: String): Boolean = this.course.map(_.courseId).contains(courseId)
+
+    override def enrollStudent(studentId: String,
+                               courseId: String): Unit = if isCourseAvailable(courseId) then this.c2s = this.c2s.concat(Sequence((courseId, studentId)))
+
+    override def unenrollStudent(studentId: String,
+                                 courseId: String): Unit = this.c2s = this.c2s.filter(_ != (courseId, studentId))
+
+    override def getStudentEnrollments(studentId: String): Sequence[Course] =
+      val enrolledCourses = this.c2s.filter(_._2 equals studentId).map(_._1)
+      this.course.filter(course => enrolledCourses.contains(course.courseId))
+
+    override def isStudentEnrolled(studentId: String,
+                                   courseId: String): Boolean = this.c2s.contains((courseId, studentId))
 
 /**
  * Represents an online learning platform that offers courses and manages student enrollments.
@@ -158,4 +183,3 @@ object OnlineCoursePlatform:
   platform.removeCourse(pythonCourse)
   println(s"Is PYTHON01 available? ${platform.isCourseAvailable(pythonCourse.courseId)}") // false
   println(s"Programming courses: ${platform.findCoursesByCategory("Programming")}") // Sequence(scalaCourse)
-
