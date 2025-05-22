@@ -28,12 +28,13 @@ object LogicsScala:
     private val maxMiss = 5
 
     override def hit(row: Int, col: Int): ResultScala =
-      if row == startingBoat._1 && col >= startingBoat._2 && col < startingBoat._2 + boat
-        then {countHit = countHit + 1
-          if countHit == boat
-            then ResultScala.Won
-            else ResultScala.Hit}
-        else {countMiss = countMiss + 1
-          if countMiss == maxMiss
-            then ResultScala.Lost
-            else ResultScala.Miss}
+      if row == startingBoat._1 && col >= startingBoat._2 && col < startingBoat._2 + boat then 
+        countHit = countHit + 1
+        if countHit == boat then 
+          ResultScala.Won 
+        else ResultScala.Hit 
+      else
+        countMiss = countMiss + 1
+        if countMiss == maxMiss then 
+          ResultScala.Lost 
+        else ResultScala.Miss
