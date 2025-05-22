@@ -9,10 +9,10 @@ public class GUI extends JFrame {
 
     private static final long serialVersionUID = -6218820567019985015L;
     private final Map<JButton,Pair<Integer,Integer>> buttons = new HashMap<>();
-    private final Logics logics;
+    private final LogicsScala logics;
 
     public GUI(int size, int mines) {
-        this.logics = new LogicsImpl(size,mines);
+        this.logics = LogicsScala.apply(size, mines);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setSize(100*size, 100*size);
 

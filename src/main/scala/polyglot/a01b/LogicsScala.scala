@@ -19,20 +19,30 @@ trait LogicsScala:
 object LogicsScala:
   def apply(size: Int, mines: Int): LogicsScala = LogicsImpl(size, mines)
 
-  private class LogicsImpl(private val size: Int, private val mines: Int) extends LogicsScala:
+  private class LogicsImpl(private val _size: Int, private val _mines: Int) extends LogicsScala:
 
-    private var minesPos = Sequence.Nil[(Int, Int)]()
-    private var countMines = 0
-    private var countClicks = 0
-    while (countMines < mines)
-      val pos = (Random.nextInt(size), Random.nextInt(size))
-      if (!minesPos.contains(pos)) then
-        minesPos = minesPos.concat(Sequence.Cons(pos, Sequence.Nil()))
-        countMines = countMines + 1
+    private var _minesPos = Sequence.Nil[(Int, Int)]()
+    private var _countMines = 0
+    private var _countClicks = 0
+    while (_countMines < _mines)
+      val pos = (Random.nextInt(_size), Random.nextInt(_size))
+      if !_minesPos.contains(pos) then
+        _minesPos = _minesPos.concat(Sequence.Cons(pos, Sequence.Nil()))
+        _countMines = _countMines + 1
         println(s"Pos: (${pos._1}, ${pos._2})")
 
 
     override def hit(x: Int, y: Int): java.util.Optional[Integer] =
-      OptionToOptional(ScalaOptional.Empty()) // Option => Optional converter
+      if _minesPos.contains((x, y)) then
+        OptionToOptional(ScalaOptional.Empty()) // Option => Optional converter
+      else
+        _countClicks = _countClicks + 1
+        var countNeighbors = 0
+        for 
+          i <- x - 1 to x +1
+          j <- y - 1 to y + 1
+        yield countNeighbors = countNeighbors + (if _minesPos.contains((i, j)) then 1 else 0)
+        OptionToOptional(ScalaOptional.Just(countNeighbors))
 
-    override def won = false
+
+    override def won: Boolean = _size * _size - _mines == _countClicks
