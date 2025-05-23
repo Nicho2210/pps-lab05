@@ -2,6 +2,8 @@ package util
 import Optionals.Optional.*
 import util.Optionals.Optional
 
+import scala.annotation.tailrec
+
 object Sequences: // Essentially, generic linkedlists
   
   enum Sequence[E]:
@@ -41,6 +43,7 @@ object Sequences: // Essentially, generic linkedlists
         case x if f(x) => Cons(x, Nil())
         case _ => Nil()
 
+      @tailrec
       def find(f: A => Boolean): Optional[A] = sequence match
         case Cons(h, t) if f(h) => Just(h)
         case Cons(_, t) => t.find(f)
@@ -51,7 +54,12 @@ object Sequences: // Essentially, generic linkedlists
       def reverse(): Sequence[A] = sequence match
         case Cons(h, t) => t.reverse().concat(Cons(h, Nil()))
         case _ => Nil()
-@main def trySequences =
+        
+      def isEmpty: Boolean = sequence match
+        case Nil() => true
+        case _ => false
+          
+@main def trySequences(): Unit =
   import Sequences.* 
   val sequence = Sequence(1, 2, 3)
   println(sequence)
