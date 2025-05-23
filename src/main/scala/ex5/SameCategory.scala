@@ -6,7 +6,7 @@ import util.Sequences.Sequence.*
 
 object SameCategory:
   def unapply(seq: Sequence[Course]): Option[String] = seq match
-    case Cons(h, t) => if t.filter(_.category != h.category).isEmpty() then Some(h.category) else None
+    case Cons(h, t) => if t.filter(_.category != h.category).isEmpty then Some(h.category) else None
     case _ => None
 
 @main def test(): Unit =
